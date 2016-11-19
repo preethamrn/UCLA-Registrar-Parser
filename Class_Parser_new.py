@@ -59,9 +59,9 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-gmail_user = "preetham.in.1997@gmail.com"
+gmail_user = "email@abc.com" #change this line
 #gmail_pwd = "password" #change this line
-TO = 'preetham.in.1997@gmail.com'
+TO = 'email@abc.com'
 SUBJECT = "Testing sending using gmail"
 TEXT = "Testing sending mail using gmail servers"
 server = smtplib.SMTP_SSL('smtp.gmail.com:465')
