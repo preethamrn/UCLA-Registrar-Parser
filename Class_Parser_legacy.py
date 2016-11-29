@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 import urllib
 
 # Example: This checks the classes COM SCI 174A (any lecture) and STATS 10 (LEC 2) for the 17W quarter
-classes = [('COM SCI 174A', 0), ('STATS 10', 5)]
+classes = [('COM SCI 174A', 0), ('STATS 10', 2)]
 quarter = '17W'
 
 def get_class(class_name):
@@ -65,7 +65,7 @@ for course, lec in classes:
 		try:
 			check_lecture(lectures[lec-1])
 		except IndexError:
-			print "Error: lecture number is out of range"
+			print "Error: " + course + " lecture number is out of range"
 
 
 if class_found_flag:
