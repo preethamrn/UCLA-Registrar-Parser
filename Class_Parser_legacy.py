@@ -19,9 +19,10 @@ import re # parse the input string using regex
 from bs4 import BeautifulSoup
 import urllib
 
+
 # Example: This checks the classes COM SCI 174A (any lecture) and STATS 10 (LEC 2) for the 17W quarter
-classes = [('COM SCI 174A', 0), ('STATS 10', 2)]
-quarter = '17W'
+# classes = [('COM SCI 174A', 0), ('STATS 10', 2)]
+# quarter = '17W'
 
 def get_class(class_name):
 	subject = '+'.join(class_name.split(' ')[:-1])
@@ -36,7 +37,8 @@ def get_class(class_name):
 	number = number+last+first
 	return (subject, number)
 
-def check_lecture(lecture):
+def check_lecture(lecture, og_cff = False):
+	class_found_flag = og_cff
 	class_status = lecture.nextSibling
 	capacity = int(class_status.find('td', {'class', 'dgdClassDataEnrollCap'}).text)
 	enrolled = int(class_status.find('td', {'class', 'dgdClassDataEnrollTotal'}).text)
@@ -48,29 +50,35 @@ def check_lecture(lecture):
 	elif wait_enrolled < wait_capacity:
 		class_found_flag = True
 		print course + ": Wait"
+	return class_found_flag
 
-class_found_flag = False
 
-for course, lec in classes:
-	(subject, number) = get_class(course)
-	URL = 'http://legacy.registrar.ucla.edu/schedule/detselect.aspx?termsel={0}&subareasel={1}&idxcrs={2}'.format(quarter, subject, number)
-	soup = BeautifulSoup(urllib.urlopen(URL))
+
+if __name__ == '__main__':
+	classes = [('COM SCI 174A', 0), ('STATS 10', 2)]
+	quarter = '17W'
+
+	class_found_flag = False
+
+	for course, lec in classes:
+		(subject, number) = get_class(course)
+		URL = 'http://legacy.registrar.ucla.edu/schedule/detselect.aspx?termsel={0}&subareasel={1}&idxcrs={2}'.format(quarter, subject, number)
+		soup = BeautifulSoup(urllib.urlopen(URL))
+		
+		lectures = soup.find_all('tr', {'class','dgdClassDataHeader'})
+		
+		if lec == 0:
+			for lecture in lectures:
+				class_found_flag = check_lecture(lecture) or class_found_flag
+		else:
+			try:
+				class_found_flag = check_lecture(lectures[lec-1]) or class_found_flag
+			except IndexError:
+				print "Error: " + course + " lecture number is out of range"
+
+	if class_found_flag:
+		os.system("pause")
 	
-	lectures = soup.find_all('tr', {'class','dgdClassDataHeader'})
-	
-	if lec == 0:
-		for lecture in lectures:
-			check_lecture(lecture)
-	else:
-		try:
-			check_lecture(lectures[lec-1])
-		except IndexError:
-			print "Error: " + course + " lecture number is out of range"
-
-
-if class_found_flag:
-	os.system("pause")
-
 
 """
 #Failed attempt at sending email :(
